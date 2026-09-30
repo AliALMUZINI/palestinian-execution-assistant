@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       providerOptions: {
         google: {
           thinkingConfig: {
-            thinkingLevel: 'minimal'
+           thinkingLevel: 'low'
           }
         }
       },
