@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     const { text } = await generateText({
       model: google('gemini-3.7-flash'),
       maxOutputTokens: 2000,
-      maxRetries: 0,
+     maxRetries: 3,
       system: PALESTINIAN_EXECUTION_INSTRUCTIONS,
       prompt: `نوع الخدمة: ${requestType}
 الهدف الإجرائي: ${goal || 'غير محدد'}
