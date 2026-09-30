@@ -8,7 +8,7 @@
     "start": "vercel dev"
   },
   "dependencies": {
-    "@ai-sdk/gateway": "latest",
+  
     "ai": "latest"
   },
   "devDependencies": {
