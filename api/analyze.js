@@ -1,5 +1,5 @@
 import { generateText } from 'ai';
-import { gateway } from '@ai-sdk/gateway';
+
 
 const PALESTINIAN_EXECUTION_INSTRUCTIONS = `
 أنت مساعد التنفيذ الفلسطيني في مكتب المحامي علي محمد المزيني.
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   if (!facts.trim()) return res.status(400).json({ error: 'يرجى إدخال الوقائع أولاً.' });
   try {
     const { text } = await generateText({
-      model: gateway('openai/gpt-5.5'),
+    model: 'openai/gpt-5.5',
       system: PALESTINIAN_EXECUTION_INSTRUCTIONS,
       prompt: `نوع الخدمة: ${requestType}\nالهدف الإجرائي: ${goal || 'غير محدد'}\nالوقائع:\n${facts}`
     });
