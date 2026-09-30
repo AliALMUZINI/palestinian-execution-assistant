@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
   try {
     const { text } = await generateText({
-      model: google('gemini-2.5-flash'),
+     model: google('gemini-3.8-flash'),
       system: PALESTINIAN_EXECUTION_INSTRUCTIONS,
       prompt: `نوع الخدمة: ${requestType}
 الهدف الإجرائي: ${goal || 'غير محدد'}
