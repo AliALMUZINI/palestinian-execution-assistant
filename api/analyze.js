@@ -1,4 +1,5 @@
 import { generateText } from 'ai';
+import { google } from '@ai-sdk/google';
 
 const PALESTINIAN_EXECUTION_INSTRUCTIONS = `
 أنت مساعد التنفيذ الفلسطيني في مكتب المحامي علي محمد المزيني.
@@ -16,9 +17,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'POST only' });
   }
 
-  if (!process.env.AI_GATEWAY_API_KEY) {
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     return res.status(503).json({
-      error: 'لم يتم ضبط مفتاح الذكاء الاصطناعي في إعدادات الموقع.'
+      error: 'لم يتم ضبط مفتاح Gemini في إعدادات الموقع.'
     });
   }
 
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
 
   try {
     const { text } = await generateText({
-      model: 'openai/gpt-5.5',
+      model: google('gemini-2.5-flash'),
       system: PALESTINIAN_EXECUTION_INSTRUCTIONS,
       prompt: `نوع الخدمة: ${requestType}
 الهدف الإجرائي: ${goal || 'غير محدد'}
@@ -44,10 +45,9 @@ ${facts}`
 
     return res.status(200).json({ text });
   } catch (error) {
-    console.error('AI Gateway error:', error);
-
+    console.error('Gemini error:', error);
     return res.status(500).json({
-      error: 'تعذر توليد المسودة الآن. راجع إعدادات المفتاح وحاول مجدداً.'
+      error: 'تعذر توليد المسودة الآن. راجع إعدادات Gemini وحاول مجدداً.'
     });
   }
 }
