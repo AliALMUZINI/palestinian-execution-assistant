@@ -1,6 +1,5 @@
 import { generateText } from 'ai';
 
-
 const PALESTINIAN_EXECUTION_INSTRUCTIONS = `
 أنت مساعد التنفيذ الفلسطيني في مكتب المحامي علي محمد المزيني.
 تلتزم حصراً بقانون التنفيذ الفلسطيني رقم (23) لسنة 2005 وتعديلاته، وبالقواعد الإجرائية الفلسطينية ذات الصلة.
@@ -13,20 +12,42 @@ const PALESTINIAN_EXECUTION_INSTRUCTIONS = `
 `;
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
-  if (!process.env.AI_GATEWAY_API_KEY) {
-    return res.status(503).json({ error: 'لم يتم ضبط مفتاح الذكاء الاصطناعي في إعدادات الموقع.' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'POST only' });
   }
-  const { requestType = 'تحليل واقعة تنفيذية', facts = '', goal = '' } = req.body || {};
-  if (!facts.trim()) return res.status(400).json({ error: 'يرجى إدخال الوقائع أولاً.' });
+
+  if (!process.env.AI_GATEWAY_API_KEY) {
+    return res.status(503).json({
+      error: 'لم يتم ضبط مفتاح الذكاء الاصطناعي في إعدادات الموقع.'
+    });
+  }
+
+  const {
+    requestType = 'تحليل واقعة تنفيذية',
+    facts = '',
+    goal = ''
+  } = req.body || {};
+
+  if (!facts.trim()) {
+    return res.status(400).json({ error: 'يرجى إدخال الوقائع أولاً.' });
+  }
+
   try {
     const { text } = await generateText({
-    model: 'openai/gpt-5.5',
+      model: 'openai/gpt-5.5',
       system: PALESTINIAN_EXECUTION_INSTRUCTIONS,
-      prompt: `نوع الخدمة: ${requestType}\nالهدف الإجرائي: ${goal || 'غير محدد'}\nالوقائع:\n${facts}`
+      prompt: `نوع الخدمة: ${requestType}
+الهدف الإجرائي: ${goal || 'غير محدد'}
+الوقائع:
+${facts}`
     });
+
     return res.status(200).json({ text });
   } catch (error) {
-    return res.status(500).json({ error: 'تعذر توليد المسودة الآن. راجع إعدادات المفتاح وحاول مجدداً.' });
+    console.error('AI Gateway error:', error);
+
+    return res.status(500).json({
+      error: 'تعذر توليد المسودة الآن. راجع إعدادات المفتاح وحاول مجدداً.'
+    });
   }
 }
