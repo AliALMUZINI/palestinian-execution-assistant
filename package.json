@@ -1,0 +1,9 @@
+{
+  "name": "palestinian-execution-assistant",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {"dev":"vercel dev","start":"vercel dev"},
+  "dependencies": {"@ai-sdk/google":"latest","ai":"latest"},
+  "devDependencies": {"vercel":"latest"}
+}
