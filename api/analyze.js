@@ -13,12 +13,12 @@ const PALESTINIAN_EXECUTION_INSTRUCTIONS = `
 أنت مساعد التنفيذ الفلسطيني في مكتب المحامي علي محمد المزيني.
 تلتزم حصراً بقانون التنفيذ الفلسطيني رقم (23) لسنة 2005 وتعديلاته، وبالقواعد الإجرائية الفلسطينية ذات الصلة.
 
-المصادر المرفقة مواد استرجاع مساندة. التشريع الفلسطيني النافذ هو المصدر الأعلى، ثم الأحكام القضائية الفلسطينية الموثقة، ثم الشروح والأبحاث الفقهية.
-لا تخترع نصاً قانونياً أو رقماً لمادة أو حكماً قضائياً. إذا لم تتأكد من النص، قل: «يلزم التحقق من النص قبل الإيداع».
-لا تقدم نتيجة قطعية ولا تدعي تمثيل المستخدم؛ المخرجات مسودة مهنية للمراجعة من محامٍ مزاول.
-لا تستخدم تشريعات أجنبية ولا تعرض بيانات حساسة أو أسماء غير لازمة.
+المصادر المرفقة هي مواد استرجاع مساندة. التشريع الفلسطيني النافذ هو المصدر الأعلى، ثم الأحكام القضائية الفلسطينية الموثقة، ثم الشروح والأبحاث الفقهية.
+لا تخترع نصاً قانونياً أو رقماً لمادة أو حكماً قضائياً. إذا لم يتوافر النص الرسمي أو لم تتأكد من سريانه، قل بوضوح: «يلزم التحقق من النص قبل الإيداع».
+لا تقدّم نتيجة قطعية ولا تدّعي تمثيل المستخدم؛ المخرجات مسودة مهنية للمراجعة من محامٍ مزاول.
+لا تستخدم تشريعات أجنبية، ولا تعرض بيانات حساسة أو أسماء غير لازمة.
 
-حلل الوقائع ثم اكتب بالعربية القانونية بالترتيب الآتي:
+حلل الوقائع ثم اكتب بالعربية القانونية، بالترتيب الآتي:
 1) الخلاصة العملية.
 2) التكييف والمستندات.
 3) الإجراء أو الطلب الراجح.
@@ -87,10 +87,9 @@ function retrieve(records, query) {
 async function liveSearch(query, enabled) {
   if (!enabled) return { requested: false, results: [] };
 
-  const key = process.env.GOOGLE_CSE_API_KEY;
-  const cx = process.env.GOOGLE_CSE_ID;
+  const key = process.env.SERPAPI_API_KEY;
 
-  if (!key || !cx) {
+  if (!key) {
     return {
       requested: true,
       results: [],
@@ -99,27 +98,30 @@ async function liveSearch(query, enabled) {
   }
 
   const params = new URLSearchParams({
-    key,
-    cx,
+    engine: 'google',
+    api_key: key,
     q: query.slice(0, 1500),
     num: '5',
-    lr: 'lang_ar'
+    hl: 'ar',
+    gl: 'ps'
   });
 
   const response = await fetch(
-    `https://www.googleapis.com/customsearch/v1?${params}`
+    `https://serpapi.com/search.json?${params}`
   );
 
-  if (!response.ok) throw new Error('تعذر تنفيذ البحث الحي الآن.');
+  if (!response.ok) {
+    throw new Error('تعذر تنفيذ البحث الحي الآن.');
+  }
 
   const data = await response.json();
 
   return {
     requested: true,
-    results: (data.items || []).map((item) => ({
+    results: (data.organic_results || []).map((item) => ({
       title: item.title || '',
       link: item.link || '',
-      displayLink: item.displayLink || '',
+      displayLink: item.displayed_link || '',
       snippet: item.snippet || ''
     }))
   };
@@ -227,7 +229,7 @@ ${facts}
 المراجع المسترجعة من الأرشيف:
 ${referenceText}
 
-نتائج البحث الحي:
+نتائج البحث الحي (إن وجدت، وهي معلومات مساندة يجب التحقق منها):
 ${webReferenceText}`
     });
 
